@@ -1,0 +1,281 @@
+set $super Mod4
+set $alt Mod1
+
+font pango: Ubuntu Mono 7
+
+##### WORKSPACE NAMES
+set $WS_1 "1 main"
+set $WS_MAIN "1 main"
+set $WS_2 "2 communication"
+set $WS_COMM "2 communication"
+set $WS_3 "3 programming"
+set $WS_PROGRAMMING "3 programming"
+set $WS_4 "4 work"
+set $WS_WORK "4 work"
+set $WS_5 "5 music"
+set $WS_MUSIC "5 music"
+set $WS_6 "6 games"
+set $WS_GAMES "6 games"
+set $WS_7 "7 system config"
+set $WS_CONFIG "7 system config"
+set $WS_8 "8"
+set $WS_9 "9"
+set $WS_0 "0 output"
+set $WS_OUTPUT "0 output"
+
+# Use Mouse+$super to drag floating windows to their wanted position
+floating_modifier $super
+
+set $term gnome-terminal
+set $term_exec_flag -x
+
+set $backlight_default 25
+
+##### ON STARTUP OR RELOAD
+exec_always feh --bg-scale ~/Pictures/background\ Print\ Gallery.png
+exec_always i3-msg bar mode hide
+
+#### ON STARTUP
+# low-level fixes and settings
+exec xautolock -detectsleep -time 5 -locker ~/.i3/lock.sh -notify 30 -notifier "notify-send 'Locking screen in 30 seconds!' --urgency normal --expire-time 30"
+exec /usr/lib/gnome-settings-daemon/gnome-settings-daemon
+exec synclient HorizTwoFingerScroll=1
+exec xbacklight -set $backlight_default
+# make the terminal appear with my cow-said fortune
+exec $term $term_exec_flag ~/startup\ fortune.sh
+# start Autokey
+exec autokey
+# start Dropbox
+exec dropbox start
+# start Skype (after GNOME starts)
+exec sleep 1.5; skype
+# start Eclipse
+exec eclipse
+# start Spotify
+exec spotify
+# start Steam
+exec steam
+# start the Network Manager
+exec nm-applet
+# start Blueman, the Bluetooth manager
+exec blueman-applet
+# start the status updater
+exec ~/.i3/status\ checker.sh
+# start the keyboard awesome lighting effects
+exec java -jar ~/.i3/keyboard\ lighting.jar
+# start dunst
+exec dunst
+# start up Chrome with some useful tabs open
+exec --no-startup-id sleep 2.5; i3-msg workspace $WS_1; google-chrome https://inbox.google.com/ https://www.facebook.com/ https://sodaasu.slack.com/messages/general/ # wait for the GNOME session to really start up, then switch to workspace 1 and open Chrome pages
+
+##### MONITOR/PROJECTOR WORKSPACE
+workspace $WS_OUTPUT output HDMI1
+workspace $WS_OUTPUT output VGA1
+
+##### APPLICATION WINDOW TWEAKS
+# Note: use `xprop -spy` or the 'window info.sh' script to get window class and other window info
+## workspace-specific applications
+for_window [class="Skype"] move container to workspace $WS_COMM
+for_window [class="gitkraken"] move container to workspace $WS_PROGRAMMING
+for_window [class="Eclipse"] move container to workspace $WS_PROGRAMMING
+for_window [class="Java" title="^Eclipse ?$"] move container to workspace $WS_PROGRAMMING
+for_window [class="Steam"] move container to workspace $WS_GAMES
+for_window [class="Minecraft" instance="Minecraft" title="Minecraft"] move container to workspace $WS_GAMES
+for_window [title="Spotify" instance="spotify" title="Spotify"] move container to workspace $WS_MUSIC
+for_window [class="net-minecraft-bootstrap-Bootstrap" instance="sun-awt-X11-XFramePeer" title="Minecraft Launcher"] move container to workspace $WS_GAMES
+for_window [class="Codeblocks" instance="codeblocks"] move container to workspace $WS_PROGRAMMING
+for_window [class="MintUpdate.py"] move container to workspace $WS_CONFIG
+for_window [class="Synaptic" instance="synaptic" title="Applying Changes"] move container to workspace $WS_CONFIG
+for_window [class="google-chrome" instance="crx_" title="Google Hangouts - conman.davey@gmail.com" window_role="app"] move container to workspace $WS_COMM
+## float windows
+for_window [class="Eclipse" title="^Eclipse( SDK )?$"] floating enable
+for_window [class="Eclipse" title="Progress Information"] floating enable
+for_window [class="file_progress"] floating enable
+for_window [title="Calculator"] floating enable
+### splash screens
+for_window [class="Skype" instance="skype" title="Skype™ - "] floating enable
+for_window [class="Skype" instance="skype" title="Skype™ - "] border none
+for_window [class="Codeblocks" instance="codeblocks"] floating enable
+for_window [class="Codeblocks" instance="codeblocks"] border none
+for_window [class="Codeblocks" instance="codeblocks" title=".*Code::Blocks.*"] floating disable
+for_window [class="Codeblocks" instance="codeblocks" title="."] border normal
+### "full screen" windows
+for_window [class="Minecraft" instance="Minecraft" title="Minecraft"] border none
+for_window [class="google-chrome"] border none
+for_window [class="ShooterGame" instance="ShooterGame" title="ARK: Survival Evolved"] border none
+## other
+for_window [class="Nemo" instance="nemo" title="Desktop"] move scratchpad
+for_window [class="Gedit"] border normal
+for_window [class="ShooterGame" instance="ShooterGame" title="ARK: Survival Evolved"] floating disable
+for_window [class="ShooterGame" instance="ShooterGame" title="ARK: Survival Evolved"] border none
+for_window [class="ShooterGame" instance="ShooterGame" title="ARK: Survival Evolved"] fullscreen enable
+for_window [class="google-chrome" instance="crx_" title="Google Hangouts - conman.davey@gmail.com" window_role="app"] border none
+for_window [class="google-chrome" instance="crx_" title="Google Hangouts - conman.davey@gmail.com" window_role="app"] floating disable
+
+
+##### HOTKEYS
+# start a terminal
+bindsym $super+Return exec $term
+bindsym Control+$alt+t exec $term
+# open scratch paper
+bindsym Control+space exec gedit ~/scratch\ paper.txt
+# kill focused window
+bindsym $alt+F4 kill
+# launch something with dmenu
+bindsym $super+d exec dmenu_run
+bindsym $super+$alt+d exec gksudo -- dmenu_run -nb '#770000'
+bindsym $super+e exec ~/.i3/dmenu\ with\ files.sh --show-hidden-files
+bindsym $super+$alt+e exec gksudo -- bash -c "'~/.i3/dmenu with files.sh' --show-hidden-files --sudo"
+# Google search
+bindsym $super+F1 exec ~/.i3/google.sh
+# start or restart skype
+bindsym $super+$alt+s exec ~/.i3/start\ or\ restart\ Skype.sh
+# screenshots
+bindsym Print exec scrot Pictures/screenshot\ .\ `date -Iseconds`.png
+# TODO: fix this shortcut; the command should work!
+bindsym $super+Print exec ~/.i3/window\ screenshot.sh
+# toggle screen output mode
+bindsym $super+p exec ~/.i3/toggle\ monitor\ output.sh
+# get a window's info for i3 for_window configurations
+bindsym $super+w exec ~/.i3/window\ info.sh --notify
+# other random important programs
+## Google Chrome
+bindsym XF86HomePage exec google-chrome
+## htop
+bindsym $super+h exec $term $term_exec_flag htop
+bindsym $alt+$super+h exec $term $term_exec_flag sudo htop
+## calculator
+bindsym $super+KP_0 exec gnome-calculator
+bindsym $super+KP_Insert exec gnome-calculator
+## Minecraft
+### just Minecraft
+bindsym $super+m exec java -jar ~/.minecraft/Minecraft.jar
+### reminder of the key combo change
+bindsym Control+m exec notify-send 'Minecraft opens with Super+M now!' --urgency normal --expire-time 3
+### with Twitch streaming
+bindsym $super+$alt+m exec gnome-terminal -x ffmpeg -f x11grab -s 1600x900 -r 35 -i :0.0+0,0 -itsoffset 00:00:01 -f alsa -ac 2 -i pulse -vcodec libx264 -s 1600x900 -acodec libmp3lame -y -ar 44100 -threads 8 -qscale 5 -b 1024k -f flv rtmp://live.twitch.tv/app/live_37299039_lOaIIw1KcXnr2Q6Kw3aNoOaHnRg13V & java -jar ~/.minecraft/Minecraft.jar & xdg-open 'http://www.twitch.tv/chat/embed?channel=realdrummer&popout_chat=true'
+### test server
+bindsym Control+$alt+m exec gnome-terminal -x sh ~/Minecraft/Spigot testing/start.sh
+## GitKraken
+bindsym $super+g exec gitkraken
+## Autokey
+bindsym $super+a exec autokey
+## Eclipse
+bindsym $alt+$super+p exec eclipse
+
+##### SYSTEM CONTROL
+# system control mode
+set $system_control_mode "System: (e) exit, (l) lock, (s) suspend, (r) reboot, (Enter) shutdown"
+set $quit gnome-session-quit --logout --no-prompt; i3-msg exit
+mode $system_control_mode {
+	bindsym l exec ~/.i3/lock.sh, mode "default"
+	bindsym s exec "~/.i3/lock.sh; wait 1; sudo pm-suspend", mode "default"
+	bindsym e exec "i3-nagbar -t warning -m 'Do you really want to log out?' -b 'Yep.' '$quit'", mode "default"
+	bindsym r exec "i3-nagbar -t warning -m 'Do you really want to reboot?' -b 'Yep. I will see you in a bit!' '$quit; sudo shutdown -r now'", mode "default"
+	bindsym Return exec "i3-nagbar -t warning -m 'Do you really want to shut down?' -b 'Yep. Bye.' '$quit; sudo shutdown -P now'", mode "default"
+
+	bindsym Escape mode "default"
+}
+bindsym $super+KP_Enter mode $system_control_mode
+# lock the screen
+bindsym $super+l exec ~/.i3/lock.sh
+# adjust CPU performance
+bindsym Control+Shift+Up exec ~/.i3/performance\ level.sh +1 --notify
+bindsym Control+Shift+Down exec ~/.i3/performance\ level.sh -1 --notify
+# backup home onto an external drive
+bindsym $super+KP_Decimal exec ~/.i3/backup.sh 'Connors Passport' --notify
+
+##### WINDOW CONTROL
+# move windows with arrow keys
+bindsym $super+Left move left
+bindsym $super+Down move down
+bindsym $super+Up move up
+bindsym $super+Right move right
+# split in horizontal orientation
+bindsym $super+space split toggle
+# enter fullscreen mode for the focused container
+bindsym $super+f fullscreen
+# stack windows
+bindsym $super+s layout stacking
+# change window shapes
+bindsym $super+Shift+space floating toggle
+bindsym $super+BackSpace move scratchpad
+bindsym $super+$alt+BackSpace scratchpad show
+# switch to workspace
+bindsym $super+1 workspace $WS_1
+bindsym $super+2 workspace $WS_2
+bindsym $super+3 workspace $WS_3
+bindsym $super+4 workspace $WS_4
+bindsym $super+5 workspace $WS_5
+bindsym $super+6 workspace $WS_6
+bindsym $super+7 workspace $WS_7
+bindsym $super+8 workspace $WS_8
+bindsym $super+9 workspace $WS_9
+bindsym $super+0 workspace $WS_0
+# workspace cycling
+bindsym Control+$alt+Left exec notify-send "Use Super now instead of Alt!" --urgency normal --expire-time 3
+bindsym Control+$alt+Right exec notify-send "Use Super now instead of Alt!" --urgency normal --expire-time 3
+bindsym Control+$super+Left workspace prev
+bindsym Control+$super+Right workspace next
+# workspace cycling carrying window
+bindsym Control+$alt+Shift+Left exec notify-send "Use Super now instead of Alt!" --urgency normal --expire-time 3
+bindsym Control+$alt+Shift+Right exec notify-send "Use Super now instead of Alt!" --urgency normal --expire-time 3
+bindsym Control+$super+Shift+Left move container to workspace prev; workspace prev
+bindsym Control+$super+Shift+Right move container to workspace next; workspace next
+# move focused container to workspace
+bindsym $super+Shift+1 move container to workspace $WS_1; workspace $WS_1
+bindsym $super+Shift+2 move container to workspace $WS_2; workspace $WS_2
+bindsym $super+Shift+3 move container to workspace $WS_3; workspace $WS_3
+bindsym $super+Shift+4 move container to workspace $WS_4; workspace $WS_4
+bindsym $super+Shift+5 move container to workspace $WS_5; workspace $WS_5
+bindsym $super+Shift+6 move container to workspace $WS_6; workspace $WS_6
+bindsym $super+Shift+7 move container to workspace $WS_7; workspace $WS_7
+bindsym $super+Shift+8 move container to workspace $WS_8; workspace $WS_8
+bindsym $super+Shift+9 move container to workspace $WS_9; workspace $WS_9
+bindsym $super+Shift+0 move container to workspace $WS_0; workspace $WS_0
+
+##### MULTIMEDIA KEYS
+# music control
+# TODO: make these work for more than Banshee
+bindsym XF86AudioPlay exec ~/.i3/play\ or\ pause.sh
+bindsym XF86AudioPrev exec banshee --restart-or-previous
+bindsym XF86AudioNext exec banshee --next
+# brightness control
+bindsym XF86MonBrightnessUp exec ~/.i3/brightness\ level.sh +250 --notify
+bindsym XF86MonBrightnessDown exec ~/.i3/brightness\ level.sh -250 --notify
+# multimedia shortcuts
+bindsym XF86AudioRaiseVolume exec ~/.i3/increase\ volume.sh
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl -- set-sink-volume 1 -5% #decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+
+# open the configuration file
+bindsym $super+c workspace $WS_CONFIG; exec ~/.i3/dmenu\ with\ files.sh --show-hidden-files ~/.i3
+# reload the configuration file
+bindsym $super+Shift+c reload; bar mode hide
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $super+Shift+r restart; bar mode hide
+
+##### MODES
+# resize window
+mode "resize" {
+	# same bindings, but for the arrow keys
+	bindsym Left resize shrink width 10 px or 10 ppt
+	bindsym Down resize grow height 10 px or 10 ppt
+	bindsym Up resize shrink height 10 px or 10 ppt
+	bindsym Right resize grow width 10 px or 10 ppt
+
+	# back to normal: Enter or Escape
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+
+bindsym $super+r mode "resize"
+
+##### LOCK KEY DISABLE
+bindsym Num_Lock nop "Disable Num Lock!"
+bindsym Caps_Lock nop "Disable Caps Lock!"
+
+##### THE i3 BAR
+bar {
+	status_command ~/.i3/status\ bar.sh
+}
